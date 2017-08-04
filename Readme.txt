@@ -1,0 +1,1 @@
+This code will set led (on PC14) on and off on timer2 interrupt

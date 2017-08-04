@@ -1,0 +1,4 @@
+http://stm32.kosyak.info/doc/stm32f10x__gpio_8c_source.html //C source code for stm32f10x...
+https://gcc.gnu.org/onlinedocs/gcc/Option-Index.html 
+http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0553a/CIHJJEIH.html
+http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dui0552a/BABIFJFG.html - cortex-m3 vector table
