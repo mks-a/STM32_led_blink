@@ -14,7 +14,7 @@ sleep_mode_init:
 	ldr r0, [r1]
 	
 	@ set SLEEPONEXIT bit (first bit)
-	orr r0, r0, 0x02
+	@orr r0, r0, 0x02					@ NOTE!!! this will break returning from interrupt and because of that Program Counter will be initialized with 0x00 
 	
 	@ store r0 value to SCR register
 	str r0, [r1]

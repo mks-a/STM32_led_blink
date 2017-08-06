@@ -8,31 +8,31 @@ Disassembly of section .text:
    0:	20005000 	andcs	r5, r0, r0
 
 00000004 <RESET>:
-   4:	00000171 	andeq	r0, r0, r1, ror r1
+   4:	00000197 	muleq	r0, r7, r1
 
 00000008 <NMI_HANDLER>:
-   8:	000001ad 	andeq	r0, r0, sp, lsr #3
+   8:	000001db 	ldrdeq	r0, [r0], -fp
 
 0000000c <HARD_FAULT>:
-   c:	000001b1 			; <UNDEFINED> instruction: 0x000001b1
+   c:	000001df 	ldrdeq	r0, [r0], -pc	; <UNPREDICTABLE>
 
 00000010 <MEMORY_FAULT>:
-  10:	000001b5 			; <UNDEFINED> instruction: 0x000001b5
+  10:	000001e3 	andeq	r0, r0, r3, ror #3
 
 00000014 <BUS_FAULT>:
-  14:	000001b9 			; <UNDEFINED> instruction: 0x000001b9
+  14:	000001e7 	andeq	r0, r0, r7, ror #3
 
 00000018 <USAGE_FAULT>:
-  18:	000001bd 			; <UNDEFINED> instruction: 0x000001bd
+  18:	000001eb 	andeq	r0, r0, fp, ror #3
 	...
 
 000000b0 <TIMER2_INTERRUPT>:
-  b0:	000001c1 	andeq	r0, r0, r1, asr #3
+  b0:	000001ef 	andeq	r0, r0, pc, ror #3
 
 000000b4 <gpio_port_c_rcc_init>:
   b4:	b403      	push	{r0, r1}
   b6:	f04f 0010 	mov.w	r0, #16
-  ba:	4945      	ldr	r1, [pc, #276]	; (1d0 <returtn_form_interrupt+0x6>)
+  ba:	4951      	ldr	r1, [pc, #324]	; (200 <returtn_form_interrupt+0x6>)
   bc:	6008      	str	r0, [r1, #0]
   be:	bc03      	pop	{r0, r1}
   c0:	4770      	bx	lr
@@ -42,7 +42,7 @@ Disassembly of section .text:
   c4:	b500      	push	{lr}
   c6:	f7ff fff5 	bl	b4 <gpio_port_c_rcc_init>
   ca:	f85d eb04 	ldr.w	lr, [sp], #4
-  ce:	4941      	ldr	r1, [pc, #260]	; (1d4 <returtn_form_interrupt+0xa>)
+  ce:	494d      	ldr	r1, [pc, #308]	; (204 <returtn_form_interrupt+0xa>)
   d0:	6808      	ldr	r0, [r1, #0]
   d2:	f040 7000 	orr.w	r0, r0, #33554432	; 0x2000000
   d6:	f020 6040 	bic.w	r0, r0, #201326592	; 0xc000000
@@ -52,7 +52,7 @@ Disassembly of section .text:
 
 000000e0 <led_light_on>:
   e0:	b403      	push	{r0, r1}
-  e2:	493d      	ldr	r1, [pc, #244]	; (1d8 <returtn_form_interrupt+0xe>)
+  e2:	4949      	ldr	r1, [pc, #292]	; (208 <returtn_form_interrupt+0xe>)
   e4:	f44f 4080 	mov.w	r0, #16384	; 0x4000
   e8:	6008      	str	r0, [r1, #0]
   ea:	6808      	ldr	r0, [r1, #0]
@@ -62,7 +62,7 @@ Disassembly of section .text:
 
 000000f2 <led_flash>:
   f2:	b40f      	push	{r0, r1, r2, r3}
-  f4:	4938      	ldr	r1, [pc, #224]	; (1d8 <returtn_form_interrupt+0xe>)
+  f4:	4944      	ldr	r1, [pc, #272]	; (208 <returtn_form_interrupt+0xe>)
   f6:	6808      	ldr	r0, [r1, #0]
   f8:	4602      	mov	r2, r0
   fa:	f402 4280 	and.w	r2, r2, #16384	; 0x4000
@@ -76,113 +76,136 @@ Disassembly of section .text:
 
 00000114 <sleep_mode_init>:
  114:	b403      	push	{r0, r1}
- 116:	4931      	ldr	r1, [pc, #196]	; (1dc <returtn_form_interrupt+0x12>)
+ 116:	493d      	ldr	r1, [pc, #244]	; (20c <returtn_form_interrupt+0x12>)
  118:	6808      	ldr	r0, [r1, #0]
- 11a:	f040 0002 	orr.w	r0, r0, #2
- 11e:	6008      	str	r0, [r1, #0]
- 120:	bc03      	pop	{r0, r1}
- 122:	4770      	bx	lr
+ 11a:	6008      	str	r0, [r1, #0]
+ 11c:	bc03      	pop	{r0, r1}
+ 11e:	4770      	bx	lr
 
-00000124 <cpu_init>:
- 124:	b403      	push	{r0, r1}
- 126:	492e      	ldr	r1, [pc, #184]	; (1e0 <returtn_form_interrupt+0x16>)
- 128:	f04f 60a0 	mov.w	r0, #83886080	; 0x5000000
- 12c:	6008      	str	r0, [r1, #0]
- 12e:	bc03      	pop	{r0, r1}
- 130:	4770      	bx	lr
+00000120 <cpu_init>:
+ 120:	b403      	push	{r0, r1}
+ 122:	493b      	ldr	r1, [pc, #236]	; (210 <returtn_form_interrupt+0x16>)
+ 124:	f04f 60a0 	mov.w	r0, #83886080	; 0x5000000
+ 128:	6008      	str	r0, [r1, #0]
+ 12a:	bc03      	pop	{r0, r1}
+ 12c:	4770      	bx	lr
 
-00000132 <timer2_init>:
- 132:	b403      	push	{r0, r1}
- 134:	492b      	ldr	r1, [pc, #172]	; (1e4 <returtn_form_interrupt+0x1a>)
- 136:	6808      	ldr	r0, [r1, #0]
- 138:	f040 0001 	orr.w	r0, r0, #1
- 13c:	6008      	str	r0, [r1, #0]
- 13e:	f04f 4180 	mov.w	r1, #1073741824	; 0x40000000
- 142:	6808      	ldr	r0, [r1, #0]
- 144:	f04f 008d 	mov.w	r0, #141	; 0x8d
- 148:	6008      	str	r0, [r1, #0]
- 14a:	4927      	ldr	r1, [pc, #156]	; (1e8 <returtn_form_interrupt+0x1e>)
- 14c:	f44f 3080 	mov.w	r0, #65536	; 0x10000
- 150:	6008      	str	r0, [r1, #0]
- 152:	4926      	ldr	r1, [pc, #152]	; (1ec <returtn_form_interrupt+0x22>)
- 154:	f64f 70ff 	movw	r0, #65535	; 0xffff
- 158:	6008      	str	r0, [r1, #0]
- 15a:	4925      	ldr	r1, [pc, #148]	; (1f0 <returtn_form_interrupt+0x26>)
- 15c:	f04f 0001 	mov.w	r0, #1
- 160:	6008      	str	r0, [r1, #0]
- 162:	4924      	ldr	r1, [pc, #144]	; (1f4 <returtn_form_interrupt+0x2a>)
- 164:	6808      	ldr	r0, [r1, #0]
- 166:	f040 5080 	orr.w	r0, r0, #268435456	; 0x10000000
- 16a:	6008      	str	r0, [r1, #0]
- 16c:	bc03      	pop	{r0, r1}
- 16e:	4770      	bx	lr
+0000012e <timer2_init>:
+ 12e:	b403      	push	{r0, r1}
+ 130:	4938      	ldr	r1, [pc, #224]	; (214 <returtn_form_interrupt+0x1a>)
+ 132:	6808      	ldr	r0, [r1, #0]
+ 134:	f040 0001 	orr.w	r0, r0, #1
+ 138:	6008      	str	r0, [r1, #0]
+ 13a:	f04f 4180 	mov.w	r1, #1073741824	; 0x40000000
+ 13e:	6808      	ldr	r0, [r1, #0]
+ 140:	f04f 008d 	mov.w	r0, #141	; 0x8d
+ 144:	6008      	str	r0, [r1, #0]
+ 146:	4934      	ldr	r1, [pc, #208]	; (218 <returtn_form_interrupt+0x1e>)
+ 148:	f44f 3080 	mov.w	r0, #65536	; 0x10000
+ 14c:	6008      	str	r0, [r1, #0]
+ 14e:	4933      	ldr	r1, [pc, #204]	; (21c <returtn_form_interrupt+0x22>)
+ 150:	f64f 70ff 	movw	r0, #65535	; 0xffff
+ 154:	6008      	str	r0, [r1, #0]
+ 156:	4932      	ldr	r1, [pc, #200]	; (220 <returtn_form_interrupt+0x26>)
+ 158:	6808      	ldr	r0, [r1, #0]
+ 15a:	f040 5080 	orr.w	r0, r0, #268435456	; 0x10000000
+ 15e:	6008      	str	r0, [r1, #0]
+ 160:	4930      	ldr	r1, [pc, #192]	; (224 <returtn_form_interrupt+0x2a>)
+ 162:	f04f 500c 	mov.w	r0, #587202560	; 0x23000000
+ 166:	6008      	str	r0, [r1, #0]
+ 168:	492f      	ldr	r1, [pc, #188]	; (228 <returtn_form_interrupt+0x2e>)
+ 16a:	6808      	ldr	r0, [r1, #0]
+ 16c:	f040 5080 	orr.w	r0, r0, #268435456	; 0x10000000
+ 170:	6008      	str	r0, [r1, #0]
+ 172:	bc03      	pop	{r0, r1}
+ 174:	4770      	bx	lr
 
-00000170 <main>:
- 170:	b500      	push	{lr}
- 172:	f7ff ffd7 	bl	124 <cpu_init>
- 176:	f85d eb04 	ldr.w	lr, [sp], #4
- 17a:	b500      	push	{lr}
- 17c:	f7ff ffca 	bl	114 <sleep_mode_init>
- 180:	f85d eb04 	ldr.w	lr, [sp], #4
- 184:	b500      	push	{lr}
- 186:	f7ff ff9c 	bl	c2 <led_init>
- 18a:	f85d eb04 	ldr.w	lr, [sp], #4
- 18e:	b500      	push	{lr}
- 190:	f7ff ffcf 	bl	132 <timer2_init>
- 194:	f85d eb04 	ldr.w	lr, [sp], #4
- 198:	b662      	cpsie	i
+00000176 <timer2_enable>:
+ 176:	b403      	push	{r0, r1}
+ 178:	492c      	ldr	r1, [pc, #176]	; (22c <returtn_form_interrupt+0x32>)
+ 17a:	6808      	ldr	r0, [r1, #0]
+ 17c:	f040 0001 	orr.w	r0, r0, #1
+ 180:	6008      	str	r0, [r1, #0]
+ 182:	bc03      	pop	{r0, r1}
+ 184:	4770      	bx	lr
 
-0000019a <_main_loop>:
- 19a:	bf30      	wfi
- 19c:	be00      	bkpt	0x0000
- 19e:	b500      	push	{lr}
- 1a0:	f7ff ffa7 	bl	f2 <led_flash>
- 1a4:	f85d eb04 	ldr.w	lr, [sp], #4
- 1a8:	e7f7      	b.n	19a <_main_loop>
- 1aa:	4770      	bx	lr
+00000186 <timer2_disable>:
+ 186:	b403      	push	{r0, r1}
+ 188:	4928      	ldr	r1, [pc, #160]	; (22c <returtn_form_interrupt+0x32>)
+ 18a:	6808      	ldr	r0, [r1, #0]
+ 18c:	f000 00fe 	and.w	r0, r0, #254	; 0xfe
+ 190:	6008      	str	r0, [r1, #0]
+ 192:	bc03      	pop	{r0, r1}
+ 194:	4770      	bx	lr
 
-000001ac <nmi_fault>:
- 1ac:	be00      	bkpt	0x0000
- 1ae:	4770      	bx	lr
+00000196 <main>:
+ 196:	b500      	push	{lr}
+ 198:	f7ff ffc2 	bl	120 <cpu_init>
+ 19c:	f85d eb04 	ldr.w	lr, [sp], #4
+ 1a0:	b500      	push	{lr}
+ 1a2:	f7ff ffb7 	bl	114 <sleep_mode_init>
+ 1a6:	f85d eb04 	ldr.w	lr, [sp], #4
+ 1aa:	b500      	push	{lr}
+ 1ac:	f7ff ff89 	bl	c2 <led_init>
+ 1b0:	f85d eb04 	ldr.w	lr, [sp], #4
+ 1b4:	b500      	push	{lr}
+ 1b6:	f7ff ffba 	bl	12e <timer2_init>
+ 1ba:	f85d eb04 	ldr.w	lr, [sp], #4
+ 1be:	b662      	cpsie	i
+ 1c0:	b500      	push	{lr}
+ 1c2:	f7ff ffd8 	bl	176 <timer2_enable>
+ 1c6:	f85d eb04 	ldr.w	lr, [sp], #4
 
-000001b0 <hard_fault>:
- 1b0:	be00      	bkpt	0x0000
- 1b2:	4770      	bx	lr
+000001ca <_main_loop>:
+ 1ca:	bf30      	wfi
+ 1cc:	b500      	push	{lr}
+ 1ce:	f7ff ff90 	bl	f2 <led_flash>
+ 1d2:	f85d eb04 	ldr.w	lr, [sp], #4
+ 1d6:	e7f8      	b.n	1ca <_main_loop>
+ 1d8:	4770      	bx	lr
 
-000001b4 <memory_fault>:
- 1b4:	be00      	bkpt	0x0000
- 1b6:	4770      	bx	lr
+000001da <nmi_fault>:
+ 1da:	be00      	bkpt	0x0000
+ 1dc:	4770      	bx	lr
 
-000001b8 <bus_fault>:
- 1b8:	be00      	bkpt	0x0000
- 1ba:	4770      	bx	lr
+000001de <hard_fault>:
+ 1de:	be00      	bkpt	0x0000
+ 1e0:	4770      	bx	lr
 
-000001bc <usage_fault>:
- 1bc:	be00      	bkpt	0x0000
- 1be:	4770      	bx	lr
+000001e2 <memory_fault>:
+ 1e2:	be00      	bkpt	0x0000
+ 1e4:	4770      	bx	lr
 
-000001c0 <timer2_interupt>:
- 1c0:	b671      	cpsid	f
- 1c2:	490d      	ldr	r1, [pc, #52]	; (1f8 <returtn_form_interrupt+0x2e>)
- 1c4:	6808      	ldr	r0, [r1, #0]
- 1c6:	b661      	cpsie	f
- 1c8:	4770      	bx	lr
+000001e6 <bus_fault>:
+ 1e6:	be00      	bkpt	0x0000
+ 1e8:	4770      	bx	lr
 
-000001ca <returtn_form_interrupt>:
- 1ca:	be00      	bkpt	0x0000
- 1cc:	4770      	bx	lr
- 1ce:	10180000 	andsne	r0, r8, r0
- 1d2:	10044002 	andne	r4, r4, r2
- 1d6:	100c4001 	andne	r4, ip, r1
- 1da:	ed104001 	ldc	0, cr4, [r0, #-4]
- 1de:	1004e000 	andne	lr, r4, r0
- 1e2:	101c4002 	andsne	r4, ip, r2
- 1e6:	00284002 	eoreq	r4, r8, r2
- 1ea:	002c4000 	eoreq	r4, ip, r0
- 1ee:	000c4000 	andeq	r4, ip, r0
- 1f2:	e1004000 	mrs	r4, (UNDEF: 0)
- 1f6:	0024e000 	eoreq	lr, r4, r0
- 1fa:	Address 0x000001fa is out of bounds.
+000001ea <usage_fault>:
+ 1ea:	be00      	bkpt	0x0000
+ 1ec:	4770      	bx	lr
+
+000001ee <timer2_interupt>:
+ 1ee:	b500      	push	{lr}
+ 1f0:	f7ff ffc9 	bl	186 <timer2_disable>
+ 1f4:	f85d eb04 	ldr.w	lr, [sp], #4
+ 1f8:	4770      	bx	lr
+
+000001fa <returtn_form_interrupt>:
+ 1fa:	be00      	bkpt	0x0000
+ 1fc:	4770      	bx	lr
+ 1fe:	10180000 	andsne	r0, r8, r0
+ 202:	10044002 	andne	r4, r4, r2
+ 206:	100c4001 	andne	r4, ip, r1
+ 20a:	ed104001 	ldc	0, cr4, [r0, #-4]
+ 20e:	1004e000 	andne	lr, r4, r0
+ 212:	101c4002 	andsne	r4, ip, r2
+ 216:	00284002 	eoreq	r4, r8, r2
+ 21a:	002c4000 	eoreq	r4, ip, r0
+ 21e:	e2804000 	add	r4, r0, #0
+ 222:	e41ce000 	ldr	lr, [ip], #-0
+ 226:	e100e000 	mrs	lr, (UNDEF: 0)
+ 22a:	000ce000 	andeq	lr, ip, r0
+ 22e:	Address 0x0000022e is out of bounds.
 
 
 Disassembly of section .debug_aranges:
@@ -192,7 +215,7 @@ Disassembly of section .debug_aranges:
    4:	00000002 	andeq	r0, r0, r2
    8:	00040000 	andeq	r0, r4, r0
 	...
-  14:	000001fc 	strdeq	r0, [r0], -ip
+  14:	00000230 	andeq	r0, r0, r0, lsr r2
 	...
 
 Disassembly of section .debug_info:
@@ -202,7 +225,7 @@ Disassembly of section .debug_info:
    4:	00000002 	andeq	r0, r0, r2
    8:	01040000 	mrseq	r0, (UNDEF: 4)
 	...
-  14:	000001fc 	strdeq	r0, [r0], -ip
+  14:	00000230 	andeq	r0, r0, r0, lsr r2
   18:	336d7473 	cmncc	sp, #1929379840	; 0x73000000
   1c:	30316632 	eorscc	r6, r1, r2, lsr r6
   20:	74386333 	ldrtvc	r6, [r8], #-819	; 0xfffffccd
@@ -246,7 +269,7 @@ Disassembly of section .debug_abbrev:
 Disassembly of section .debug_line:
 
 00000000 <.debug_line>:
-   0:	00000133 	andeq	r0, r0, r3, lsr r1
+   0:	00000148 	andeq	r0, r0, r8, asr #2
    4:	00790002 	rsbseq	r0, r9, r2
    8:	01020000 	mrseq	r0, (UNDEF: 2)
    c:	000d0efb 	strdeq	r0, [sp], -fp
@@ -293,38 +316,42 @@ Disassembly of section .debug_line:
   b0:	2231312f 	eorscs	r3, r1, #-1073741813	; 0xc000000b
   b4:	03030421 	movweq	r0, #13345	; 0x3421
   b8:	24207fb2 	strtcs	r7, [r0], #-4018	; 0xfffff04e
-  bc:	22312321 	eorscs	r2, r1, #-2080374784	; 0x84000000
-  c0:	03040421 	movweq	r0, #17441	; 0x4421
-  c4:	2123206f 			; <UNDEFINED> instruction: 0x2123206f
-  c8:	0421222f 	strteq	r2, [r1], #-559	; 0xfffffdd1
-  cc:	20770305 	rsbscs	r0, r7, r5, lsl #6
-  d0:	31232124 			; <UNDEFINED> instruction: 0x31232124
-  d4:	2f232f23 	svccs	0x00232f23
-  d8:	232f2123 			; <UNDEFINED> instruction: 0x232f2123
-  dc:	21232f21 			; <UNDEFINED> instruction: 0x21232f21
-  e0:	2221232f 	eorcs	r2, r1, #-1140850688	; 0xbc000000
-  e4:	04212230 	strteq	r2, [r1], #-560	; 0xfffffdd0
-  e8:	20720306 	rsbscs	r0, r2, r6, lsl #6
-  ec:	21302f21 	teqcs	r0, r1, lsr #30
-  f0:	2f21302f 	svccs	0x0021302f
-  f4:	312f2130 			; <UNDEFINED> instruction: 0x312f2130
-  f8:	21222223 			; <UNDEFINED> instruction: 0x21222223
-  fc:	2422302f 	strtcs	r3, [r2], #-47	; 0xffffffd1
- 100:	24212421 	strtcs	r2, [r1], #-1057	; 0xfffffbdf
- 104:	24212421 	strtcs	r2, [r1], #-1057	; 0xfffffbdf
- 108:	21212321 			; <UNDEFINED> instruction: 0x21212321
- 10c:	21252121 			; <UNDEFINED> instruction: 0x21252121
- 110:	a8030104 	stmdage	r3, {r2, r8}
- 114:	02042e7f 	andeq	r2, r4, #2032	; 0x7f0
- 118:	2e1a0331 	mrccs	3, 0, r0, cr10, cr1, {1}
- 11c:	60030304 	andvs	r0, r3, r4, lsl #6
- 120:	2a04042e 	bcs	1011e0 <_stack+0x811e0>
- 124:	032e0504 			; <UNDEFINED> instruction: 0x032e0504
- 128:	33332e12 	teqcc	r3, #288	; 0x120
- 12c:	03060433 	movweq	r0, #25651	; 0x6433
- 130:	02022e35 	andeq	r2, r2, #848	; 0x350
- 134:	Address 0x00000134 is out of bounds.
-
+  bc:	21222621 			; <UNDEFINED> instruction: 0x21222621
+  c0:	6f030404 	svcvs	0x00030404
+  c4:	2f212320 	svccs	0x00212320
+  c8:	05042122 	streq	r2, [r4, #-290]	; 0xfffffede
+  cc:	24207703 	strtcs	r7, [r0], #-1795	; 0xfffff8fd
+  d0:	23312321 	teqcs	r1, #-2080374784	; 0x84000000
+  d4:	232f232f 			; <UNDEFINED> instruction: 0x232f232f
+  d8:	21232f21 			; <UNDEFINED> instruction: 0x21232f21
+  dc:	2221232f 	eorcs	r2, r1, #-1140850688	; 0xbc000000
+  e0:	3021232f 	eorcc	r2, r1, pc, lsr #6
+  e4:	21200b03 			; <UNDEFINED> instruction: 0x21200b03
+  e8:	21223022 			; <UNDEFINED> instruction: 0x21223022
+  ec:	21212225 			; <UNDEFINED> instruction: 0x21212225
+  f0:	2521222f 	strcs	r2, [r1, #-559]!	; 0xfffffdd1
+  f4:	2f212122 	svccs	0x00212122
+  f8:	06042122 	streq	r2, [r4], -r2, lsr #2
+  fc:	21204903 			; <UNDEFINED> instruction: 0x21204903
+ 100:	2f21302f 	svccs	0x0021302f
+ 104:	302f2130 	eorcc	r2, pc, r0, lsr r1	; <UNPREDICTABLE>
+ 108:	22302f21 	eorscs	r2, r0, #33, 30	; 0x84
+ 10c:	22352f21 	eorscs	r2, r5, #33, 30	; 0x84
+ 110:	22302f21 	eorscs	r2, r0, #33, 30	; 0x84
+ 114:	21242124 			; <UNDEFINED> instruction: 0x21242124
+ 118:	21242124 			; <UNDEFINED> instruction: 0x21242124
+ 11c:	21252124 			; <UNDEFINED> instruction: 0x21252124
+ 120:	2125342f 			; <UNDEFINED> instruction: 0x2125342f
+ 124:	9c030104 	stflss	f0, [r3], {4}
+ 128:	02042e7f 	andeq	r2, r4, #2032	; 0x7f0
+ 12c:	2e1a0331 	mrccs	3, 0, r0, cr10, cr1, {1}
+ 130:	60030304 	andvs	r0, r3, r4, lsl #6
+ 134:	2a04042e 	bcs	1011f4 <_stack+0x811f4>
+ 138:	032e0504 			; <UNDEFINED> instruction: 0x032e0504
+ 13c:	33332e12 	teqcc	r3, #288	; 0x120
+ 140:	2e0e0335 	mcrcs	3, 0, r0, cr14, cr5, {1}
+ 144:	022e0f03 	eoreq	r0, lr, #3, 30
+ 148:	01010002 	tsteq	r1, r2
 
 Disassembly of section .ARM.attributes:
 

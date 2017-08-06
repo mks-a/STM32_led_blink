@@ -32,6 +32,7 @@ TIMER2_INTERRUPT: .word timer2_interupt + 1
 .include "stm32f103c8t6_core/timer.inc"
 .endif
 
+.balign 2 				@ if bit 0 of address is 1 this indicate Thumb state of CPU, for Cortex-M it always should be 1, becaus it not support ARM state
 main:
 	push {lr}
 	bl cpu_init
@@ -49,13 +50,18 @@ main:
 	bl timer2_init
 	pop {lr}
 	
-	@ clear I flag is (enables interrupts), just in case
-	cpsie i
+	cpsie i						@ enable interrupts
+	
+	push {lr}
+	bl timer2_enable
+	pop {lr}
 	
 _main_loop:
-	wfi 						@ wait for interrupt
+	@push {lr}
+	@bl timer2_enable
+	@pop {lr}
 	
-	bkpt
+	wfi 						@ wait for interrupt
 	
 	push {lr}
 	bl led_flash
@@ -91,10 +97,16 @@ usage_fault:
 	bx lr
 
 timer2_interupt:
-	cpsid f						@ disable interrupts (set FAULTMASK)
-	ldr r1, =TIM2_CNT
-	ldr r0, [r1]
-	cpsie f						@ enables interrupts (clear FAULTMASK)
+	@cpsid i						@ disable interrupts
+	
+	push {lr}
+	bl timer2_disable
+	pop {lr}
+	
+	@bkpt
+	
+	@cpsie i						@ enables interrupts
+
 	bx lr				@ return from ISR (will shitch context back to main programm)
 
 @ this is dummy function that just return from interrupt
