@@ -1,20 +1,21 @@
 .thumb
 @This turns on Unified Assembly Language which is required to get all the features of Thumb-2.
 .syntax unified					@ without this line "orr r0, r0, #0x200000" will give an error "unshifted register required" 
+.cpu cortex-m3
 
 .equ STACKINIT, 0x20005000		@ end of SRAM 20kb
 
-.text
+.section .text
 .org 0x00000000					@ this not work!!!
 SP: .word STACKINIT				@ 20kb of RAM, so I will put stack pointer to the end of it
-RESET: .word main + 1
-NMI_HANDLER: .word nmi_fault + 1
-HARD_FAULT: .word hard_fault + 1
-MEMORY_FAULT: .word memory_fault + 1
-BUS_FAULT: .word bus_fault + 1
-USAGE_FAULT: .word usage_fault + 1
+RESET: .word main
+NMI_HANDLER: .word nmi_fault
+HARD_FAULT: .word hard_fault
+MEMORY_FAULT: .word memory_fault
+BUS_FAULT: .word bus_fault
+USAGE_FAULT: .word usage_fault
 .org 0x000000B0
-TIMER2_INTERRUPT: .word timer2_interupt + 1
+TIMER2_INTERRUPT: .word timer2_interupt + 1				@ the last vector should be label+1 otherwise gnu asm generate unpredictable address
 
 .ifndef LED_DEF
 .include "stm32f103c8t6_core/led.inc"
@@ -32,8 +33,13 @@ TIMER2_INTERRUPT: .word timer2_interupt + 1
 .include "stm32f103c8t6_core/timer.inc"
 .endif
 
-.balign 2 				@ if bit 0 of address is 1 this indicate Thumb state of CPU, for Cortex-M it always should be 1, becaus it not support ARM state
+@.balign 2 				@ if bit 0 of address is 1 this indicate Thumb state of CPU, for Cortex-M it always should be 1, becaus it not support ARM state
 main:
+	@ initialize flash_counter variable with 0x00000000
+	ldr r1, =flash_counter
+	ldr r0, =0x00000000
+	str r0, [r1]
+
 	push {lr}
 	bl cpu_init
 	pop {lr}
@@ -57,15 +63,19 @@ main:
 	pop {lr}
 	
 _main_loop:
+
 	@push {lr}
 	@bl timer2_enable
 	@pop {lr}
-	
+
 	wfi 						@ wait for interrupt
 	
-	push {lr}
-	bl led_flash
-	pop {lr}
+	@ldr r1, =TIM2_CR1
+	@ldr r0, [r1]
+	
+	@push {lr}
+	@bl led_flash
+	@pop {lr}
 	
 	b _main_loop				@ branch to _main_loop and not load return address to link register (LR)
 	@ return from function
@@ -97,16 +107,24 @@ usage_fault:
 	bx lr
 
 timer2_interupt:
-	@cpsid i						@ disable interrupts
+	ldr r1, =flash_counter
+	ldr r0, [r1]
+	add r0, r0, 0x01
+	
+	cmp r0, 0x00010000
+	bne _timer2_interupt_exit		@ if not zero branch to exit
+
+	
+	ldr r0, =0x00
 	
 	push {lr}
-	bl timer2_disable
+	bl led_flash
 	pop {lr}
-	
-	@bkpt
-	
-	@cpsie i						@ enables interrupts
 
+_timer2_interupt_exit:
+	
+	ldr r1, =flash_counter
+	str r0, [r1]
 	bx lr				@ return from ISR (will shitch context back to main programm)
 
 @ this is dummy function that just return from interrupt
@@ -114,6 +132,10 @@ returtn_form_interrupt:
 	@ breakpoint
 	bkpt
 	bx lr
+	
+.section .bss 					@ block started by symbol
+.offset 0x20000000				@ move bss to the beginning of SRAM
+flash_counter: .word			@ bss section holds uninitialized variables
 	
 .end
 	
