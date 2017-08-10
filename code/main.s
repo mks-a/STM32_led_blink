@@ -58,24 +58,14 @@ main:
 	
 	cpsie i						@ enable interrupts
 	
+	@ instead of timer should use RTC, timer is too fast for that purpose
 	push {lr}
 	bl timer2_enable
 	pop {lr}
 	
 _main_loop:
 
-	@push {lr}
-	@bl timer2_enable
-	@pop {lr}
-
 	wfi 						@ wait for interrupt
-	
-	@ldr r1, =TIM2_CR1
-	@ldr r0, [r1]
-	
-	@push {lr}
-	@bl led_flash
-	@pop {lr}
 	
 	b _main_loop				@ branch to _main_loop and not load return address to link register (LR)
 	@ return from function
@@ -114,7 +104,6 @@ timer2_interupt:
 	cmp r0, 0x00010000
 	bne _timer2_interupt_exit		@ if not zero branch to exit
 
-	
 	ldr r0, =0x00
 	
 	push {lr}
