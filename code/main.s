@@ -123,7 +123,7 @@ returtn_form_interrupt:
 	bx lr
 	
 .section .bss 					@ block started by symbol
-.offset 0x20000000				@ move bss to the beginning of SRAM
+@.offset 0x20000000				@ move bss to the beginning of SRAM (this is done by linkage map file)
 flash_counter: .word			@ bss section holds uninitialized variables
 	
 .end
