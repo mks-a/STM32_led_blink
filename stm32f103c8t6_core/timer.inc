@@ -25,12 +25,12 @@ timer2_init:
 	
 	@ set timer2 prescaler register
 	ldr r1, =TIM2_PSC
-	ldr r0, =0x10000			@ maximum prescaler value
+	ldr r0, =0xFFFF
 	str r0, [r1]
 	
-	@ set auto-reload value to 1 (The counter is blocked while the auto-reload value is null.)
+	@ set auto-reload value to 0xFFFF (The counter is blocked while the auto-reload value is null.)
 	ldr r1, =TIM2_ARR
-	ldr r0, =0x01
+	ldr r0, =0xFFFF
 	str r0, [r1]	
 	
 	@ clear pending state for TIM2 interrupt

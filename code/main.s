@@ -6,7 +6,7 @@
 .equ STACKINIT, 0x20005000		@ end of SRAM 20kb
 
 .section .text
-.org 0x00000000					@ this not work!!!
+.org 0x00000000					
 SP: .word STACKINIT				@ 20kb of RAM, so I will put stack pointer to the end of it
 RESET: .word main
 NMI_HANDLER: .word nmi_fault
