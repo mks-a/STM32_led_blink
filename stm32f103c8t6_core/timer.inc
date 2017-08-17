@@ -4,6 +4,50 @@ TIMER_DEF = 0
 timer2_init:
 	push {r0, r1}
 	
+	@ load value from TIM2_CR1 register
+	ldr r1, =TIM2_CR1
+	
+	ldr r0, =0x08	@ one pulse mode
+	str r0, [r1]
+	
+	@ set timer2 prescaler register
+	ldr r1, =TIM2_PSC
+	ldr r0, =0x1F40
+	str r0, [r1]
+	
+	@ set auto-reload value to 0xFFFF (The counter is blocked while the auto-reload value is null.)
+	ldr r1, =TIM2_ARR
+	ldr r0, =0x2710		@ 10000
+	str r0, [r1]
+	
+	@ re-initialize the counter and generate an update of the registers (I suppose that shadowed ARR and PSC)
+	ldr r1, =TIM2_EGR
+	ldr r0, =0x01
+	ldr r0, [r1]
+	
+	push {lr}
+	bl timer2_clear_pending
+	pop {lr}
+	
+	@ set timer2 interrupt priority (each priority register contains priority for 4 interrrupts (each priority 8bit long))
+	ldr r1, =NVIC_IPR7
+	ldr r0, =0x23000000								@ priority 35 as defined in manuals
+	
+	str r0, [r1]
+	
+	@ set 28th bit in NVIC_ISPR0 set pending register, so processor think that interrupt should be execute
+	@ldr r1, =NVIC_ISPR0
+	@ldr r0, [r1]
+	
+	@orr r0, r0, 0x10000000
+	
+	@str r0, [r1]
+	
+	push {lr}
+	bl timer2_interrupt_set_enable
+	pop {lr}
+	
+	
 	@ TIM2 timer clock enable
 	@ load value from RCC_APB1ENR register
 	ldr r1, =RCC_APB1ENR
@@ -15,55 +59,49 @@ timer2_init:
 	@ store r0 to RCC_APB1ENR
 	str r0, [r1]
 	
-	@ load value from TIM2_CR1 register
-	ldr r1, =TIM2_CR1
-	ldr r0, [r1]
+	pop {r0, r1}	
+	bx lr
 	
-	@ set timer2 Clock division bits (to 00), Auto-reload preload enable bit, Update request source bit and Counter enable bit
-	ldr r0, =0x8C @ =0x8D
-	str r0, [r1]
-	
-	@ set timer2 prescaler register
-	ldr r1, =TIM2_PSC
-	ldr r0, =0xFFFF
-	str r0, [r1]
-	
-	@ set auto-reload value to 0xFFFF (The counter is blocked while the auto-reload value is null.)
-	ldr r1, =TIM2_ARR
-	ldr r0, =0xFFFF
-	str r0, [r1]	
-	
-	@ clear pending state for TIM2 interrupt
-	@ldr r1, =NVIC_ICPR0
-	@ldr r0, [r1]
-	
-	@orr r0, r0, 0x10000000
-	@str r0, [r1]
-	
-	@ set timer2 interrupt priority (each priority register contains priority for 4 interrrupts (each priority 8bit long))
-	ldr r1, =NVIC_IPR7
-	ldr r0, =0x23000000								@ priority 35 as defined in manuals
-	
-	str r0, [r1]
-	
-	@ set 28th bit in NVIC_ISPR0 set pending register, so processor think that interrupt should be execute
-	ldr r1, =NVIC_ISPR0
-	ldr r0, [r1]
-	
-	
-	orr r0, r0, 0x10000000
-	
-	str r0, [r1]
-	
-	@ set 28th bit in NVIC_ISER0 register, this should enable TIM2 interrupt
+@ set 28th bit in NVIC_ISER0 register, this should enable TIM2 interrupt
+@ function does not take, nor recieve parameters
+timer2_interrupt_set_enable:
+	push {r0, r1}
+		
 	ldr r1, =NVIC_ISER0
 	ldr r0, [r1]
 	
 	orr r0, r0, 0x10000000
 	
 	str r0, [r1]
+		
+	pop {r0, r1}
+	bx lr
 	
-	pop {r0, r1}	
+@ set 28th bit in NVIC_ICER0 register, this should disable TIM2 interrupt
+timer2_interrupt_clear_enable:
+	push {r0, r1}
+	
+	ldr r1, =NVIC_ICER0
+	ldr r0, [r1]
+	
+	orr r0, r0, 0x10000000
+	
+	str r0, [r1]
+	
+	pop {r0, r1}
+	bx lr
+	
+@ clear pending state for TIM2 interrupt
+@ function does not take, nor recieve parameters
+timer2_clear_pending:
+	push {r0, r1}
+	
+	ldr r1, =NVIC_ICPR0
+	ldr r0, =0x10000000
+	 
+	str r0, [r1]
+	
+	pop {r0, r1}
 	bx lr
 	
 @ sets Update interrupt enable bit in TIM2_DIER register

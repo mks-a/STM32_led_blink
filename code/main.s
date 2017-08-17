@@ -39,32 +39,27 @@ main:
 	ldr r1, =flash_counter
 	ldr r0, =0x00000000
 	str r0, [r1]
+	@ldr r1, =timer_counter
+	@str r0, [r1]
 
 	push {lr}
-	bl cpu_init
-	pop {lr}
-	
-	push {lr}
-	bl sleep_mode_init
-	pop {lr}
-
-	push {lr}
+	@bl cpu_init	
+	@bl sleep_mode_init
 	bl led_init					@ call led init function
-	pop {lr}
-	
-	push {lr}
 	bl timer2_init
 	pop {lr}
 	
-	cpsie i						@ enable interrupts
-	
-	@ instead of timer should use RTC, timer is too fast for that purpose
 	push {lr}
 	bl timer2_enable
 	pop {lr}
 	
-_main_loop:
-
+	cpsie i						@ enable interrupts
+	
+_main_loop:	
+	ldr r1, =TIM2_CNT
+	ldr r0, [r1]
+	@bkpt
+	
 	wfi 						@ wait for interrupt
 	
 	b _main_loop				@ branch to _main_loop and not load return address to link register (LR)
@@ -97,14 +92,14 @@ usage_fault:
 	bx lr
 
 timer2_interupt:
-	ldr r1, =flash_counter
-	ldr r0, [r1]
-	add r0, r0, 0x01
+	@ldr r1, =flash_counter
+	@ldr r0, [r1]
+	@add r0, r0, 0x01
 	
-	cmp r0, 0x00010000
-	bne _timer2_interupt_exit		@ if not zero branch to exit
+	@cmp r0, 0x00000010
+	@bne _timer2_interupt_exit		@ if not zero branch to exit
 
-	ldr r0, =0x00
+	@ldr r0, =0x00
 	
 	push {lr}
 	bl led_flash
@@ -112,8 +107,16 @@ timer2_interupt:
 
 _timer2_interupt_exit:
 	
-	ldr r1, =flash_counter
+	@ldr r1, =flash_counter
+	@str r0, [r1]
+	
+	@ clears first bit in TIM2 status register
+	ldr r1, =TIM2_SR
+	ldr r2, =0xFFFFFFFE
+	ldr r0, [r1]
+	and r0, r0, r2
 	str r0, [r1]
+	
 	bx lr				@ return from ISR (will shitch context back to main programm)
 
 @ this is dummy function that just return from interrupt
@@ -125,6 +128,7 @@ returtn_form_interrupt:
 .section .bss 					@ block started by symbol
 @.offset 0x20000000				@ move bss to the beginning of SRAM (this is done by linkage map file)
 flash_counter: .word			@ bss section holds uninitialized variables
+@timer_counter: .word
 	
 .end
 	

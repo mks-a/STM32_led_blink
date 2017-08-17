@@ -7,3 +7,5 @@ https://sourceware.org/binutils/docs/as/ - gnu assembler directives
 https://mcuoneclipse.com/2013/04/14/text-data-and-bss-code-and-data-size-explained/ - good article about assembler sections
 
 EXC_RETURN is the value loaded into the LR on exception entry.
+
+http://stm32.kosyak.info/doc/stm32f10x__exti_8c_source.html - C source code
