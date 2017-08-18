@@ -4,10 +4,20 @@ TIMER_DEF = 0
 timer2_init:
 	push {r0, r1}
 	
+	@ TIM2 timer clock enable
+	@ load value from RCC_APB1ENR register
+	ldr r1, =RCC_APB1ENR
+	ldr r0, [r1]
+	
+	@ set bit 0 (TIM2 timer clock enable)
+	orr r0, r0, 0x01
+	
+	@ store r0 to RCC_APB1ENR
+	str r0, [r1]
+	
 	@ load value from TIM2_CR1 register
 	ldr r1, =TIM2_CR1
-	
-	ldr r0, =0x08	@ one pulse mode
+	ldr r0, =0x00
 	str r0, [r1]
 	
 	@ set timer2 prescaler register
@@ -15,15 +25,19 @@ timer2_init:
 	ldr r0, =0x1F40
 	str r0, [r1]
 	
-	@ set auto-reload value to 0xFFFF (The counter is blocked while the auto-reload value is null.)
+	@ set auto-reload value
 	ldr r1, =TIM2_ARR
-	ldr r0, =0x2710		@ 10000
+	ldr r0, =0x3E8		@ 1000
 	str r0, [r1]
 	
 	@ re-initialize the counter and generate an update of the registers (I suppose that shadowed ARR and PSC)
 	ldr r1, =TIM2_EGR
 	ldr r0, =0x01
-	ldr r0, [r1]
+	str r0, [r1]
+	
+	@push {lr}
+	@bl timer2_dbg1
+	@pop {lr}
 	
 	push {lr}
 	bl timer2_clear_pending
@@ -46,18 +60,6 @@ timer2_init:
 	push {lr}
 	bl timer2_interrupt_set_enable
 	pop {lr}
-	
-	
-	@ TIM2 timer clock enable
-	@ load value from RCC_APB1ENR register
-	ldr r1, =RCC_APB1ENR
-	ldr r0, [r1]
-	
-	@ set bit 0 (TIM2 timer clock enable)
-	orr r0, r0, 0x01
-	
-	@ store r0 to RCC_APB1ENR
-	str r0, [r1]
 	
 	pop {r0, r1}	
 	bx lr
@@ -132,6 +134,20 @@ timer2_disable:
 	ldr r0, [r1]
 	and r0, r0, 0xFE
 	str r0, [r1]
+	
+	pop {r0, r1}
+	bx lr
+	
+timer2_dbg1:
+	push {r0, r1}
+	
+	bkpt
+	
+	ldr r1, =TIM2_PSC
+	ldr r0, [r1]
+	
+	ldr r1, =TIM2_ARR
+	ldr r0, [r1]
 	
 	pop {r0, r1}
 	bx lr

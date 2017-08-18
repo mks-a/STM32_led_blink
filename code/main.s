@@ -55,11 +55,7 @@ main:
 	
 	cpsie i						@ enable interrupts
 	
-_main_loop:	
-	ldr r1, =TIM2_CNT
-	ldr r0, [r1]
-	@bkpt
-	
+_main_loop:		
 	wfi 						@ wait for interrupt
 	
 	b _main_loop				@ branch to _main_loop and not load return address to link register (LR)
@@ -92,14 +88,16 @@ usage_fault:
 	bx lr
 
 timer2_interupt:
-	@ldr r1, =flash_counter
-	@ldr r0, [r1]
-	@add r0, r0, 0x01
+	ldr r1, =flash_counter
+	ldr r0, [r1]
+	add r0, r0, 0x01
 	
-	@cmp r0, 0x00000010
+	@cmp r0, 0x00000100
 	@bne _timer2_interupt_exit		@ if not zero branch to exit
 
 	@ldr r0, =0x00
+	
+	@bkpt
 	
 	push {lr}
 	bl led_flash
@@ -107,15 +105,16 @@ timer2_interupt:
 
 _timer2_interupt_exit:
 	
-	@ldr r1, =flash_counter
-	@str r0, [r1]
-	
-	@ clears first bit in TIM2 status register
-	ldr r1, =TIM2_SR
-	ldr r2, =0xFFFFFFFE
-	ldr r0, [r1]
-	and r0, r0, r2
+	ldr r1, =flash_counter
 	str r0, [r1]
+	
+	ldr r1, =TIM2_SR
+	ldr r0, =0x00
+	str r0, [r1]
+	
+	push {lr}
+	bl timer2_clear_pending
+	pop {lr}
 	
 	bx lr				@ return from ISR (will shitch context back to main programm)
 
