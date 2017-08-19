@@ -6,6 +6,7 @@ timer2_init:
 	
 	@ TIM2 timer clock enable
 	@ load value from RCC_APB1ENR register
+	@ RCC registers initialization should be before any other registers initialization
 	ldr r1, =RCC_APB1ENR
 	ldr r0, [r1]
 	
@@ -35,10 +36,6 @@ timer2_init:
 	ldr r0, =0x01
 	str r0, [r1]
 	
-	@push {lr}
-	@bl timer2_dbg1
-	@pop {lr}
-	
 	push {lr}
 	bl timer2_clear_pending
 	pop {lr}
@@ -48,14 +45,6 @@ timer2_init:
 	ldr r0, =0x23000000								@ priority 35 as defined in manuals
 	
 	str r0, [r1]
-	
-	@ set 28th bit in NVIC_ISPR0 set pending register, so processor think that interrupt should be execute
-	@ldr r1, =NVIC_ISPR0
-	@ldr r0, [r1]
-	
-	@orr r0, r0, 0x10000000
-	
-	@str r0, [r1]
 	
 	push {lr}
 	bl timer2_interrupt_set_enable
@@ -134,20 +123,6 @@ timer2_disable:
 	ldr r0, [r1]
 	and r0, r0, 0xFE
 	str r0, [r1]
-	
-	pop {r0, r1}
-	bx lr
-	
-timer2_dbg1:
-	push {r0, r1}
-	
-	bkpt
-	
-	ldr r1, =TIM2_PSC
-	ldr r0, [r1]
-	
-	ldr r1, =TIM2_ARR
-	ldr r0, [r1]
 	
 	pop {r0, r1}
 	bx lr

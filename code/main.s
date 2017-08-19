@@ -15,18 +15,10 @@ MEMORY_FAULT: .word memory_fault
 BUS_FAULT: .word bus_fault
 USAGE_FAULT: .word usage_fault
 .org 0x000000B0
-TIMER2_INTERRUPT: .word timer2_interupt + 1				@ the last vector should be label+1 otherwise gnu asm generate unpredictable address
+TIMER2_INTERRUPT: .word timer2_interupt + 1				@ +1 is needed because thumb mode address lsb shoud have 1 
 
 .ifndef LED_DEF
 .include "stm32f103c8t6_core/led.inc"
-.endif
-
-.ifndef SLEEP_MODES_DEF
-.include "stm32f103c8t6_core/sleep_modes.inc"
-.endif
-
-.ifndef CPU_DEF
-.include "stm32f103c8t6_core/cpu.inc"
 .endif
 
 .ifndef TIMER_DEF
@@ -35,16 +27,7 @@ TIMER2_INTERRUPT: .word timer2_interupt + 1				@ the last vector should be label
 
 @.balign 2 				@ if bit 0 of address is 1 this indicate Thumb state of CPU, for Cortex-M it always should be 1, becaus it not support ARM state
 main:
-	@ initialize flash_counter variable with 0x00000000
-	ldr r1, =flash_counter
-	ldr r0, =0x00000000
-	str r0, [r1]
-	@ldr r1, =timer_counter
-	@str r0, [r1]
-
 	push {lr}
-	@bl cpu_init	
-	@bl sleep_mode_init
 	bl led_init					@ call led init function
 	bl timer2_init
 	pop {lr}
@@ -87,27 +70,14 @@ usage_fault:
 	bkpt
 	bx lr
 
-timer2_interupt:
-	ldr r1, =flash_counter
-	ldr r0, [r1]
-	add r0, r0, 0x01
-	
-	@cmp r0, 0x00000100
-	@bne _timer2_interupt_exit		@ if not zero branch to exit
-
-	@ldr r0, =0x00
-	
-	@bkpt
-	
+timer2_interupt:	
 	push {lr}
 	bl led_flash
 	pop {lr}
 
 _timer2_interupt_exit:
 	
-	ldr r1, =flash_counter
-	str r0, [r1]
-	
+	@ clear status register (especially interested in clearing bit 0 in status register), after that pending state of interrupt can be cleared
 	ldr r1, =TIM2_SR
 	ldr r0, =0x00
 	str r0, [r1]
@@ -124,10 +94,9 @@ returtn_form_interrupt:
 	bkpt
 	bx lr
 	
-.section .bss 					@ block started by symbol
+@.section .bss 					@ block started by symbol
 @.offset 0x20000000				@ move bss to the beginning of SRAM (this is done by linkage map file)
-flash_counter: .word			@ bss section holds uninitialized variables
-@timer_counter: .word
+@flash_counter: .word			@ bss section holds uninitialized variables
 	
 .end
 	
